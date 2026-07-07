@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface LoginResponse {
   token: string;
@@ -21,6 +22,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPass, setShowPass] = useState<boolean>(false);
   const { login } = useAuth();
+  const router = useRouter();
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -30,6 +32,7 @@ export default function LoginPage() {
       const response = await api.post<LoginResponse>("/api/auth/login", form);
       toast.success(`👋 Welcome back, ${response.data.user.name}!`);
       login(response.data.token, response.data.user);
+      router.push("/dashboard");
     } catch (err) {
       const errMsg = (err as AxiosError<{ error: string }>).response?.data?.error || "Invalid credentials";
       toast.error(`❌ ${errMsg}`);
