@@ -23,7 +23,7 @@ export default function DashboardPage() {
   const [kanbanData, setKanbanData] = useState<KanbanState>({ TODO: [], IN_PROGRESS: [], DONE: [] });
   const [paymentLoading, setPaymentLoading] = useState<boolean>(false);
   const hasFetched = useRef<boolean>(false);
-
+const [isUpgrading, setIsUpgrading] = useState<boolean>(false);
   useEffect(() => {
     if (!loading && !token) router.push("/login");
   }, [token, loading, router]);
@@ -35,6 +35,7 @@ export default function DashboardPage() {
 
     if (paymentStatus === "success") {
       (async () => {
+        setIsUpgrading(true);
         try {
           await api.post("/api/payments/upgrade-premium");
           toast.success("🎉 Payment Successful! Account upgraded to Premium.");
@@ -42,6 +43,7 @@ export default function DashboardPage() {
         } catch (err) {
           console.error("Upgrade error:", err);
         } finally {
+          setIsUpgrading(false);
           router.replace("/dashboard");
         }
       })();
@@ -123,7 +125,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (loading || !user) {
+  if (loading || !user || isUpgrading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
